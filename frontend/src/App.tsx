@@ -1,35 +1,48 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import "./App.css";
+
+import Navbar, { type TabType } from "./components/Navbar";
+import Dashboard from "./components/Dashboard";
+
+import { useState, useEffect } from "react";
+import Settings from "./components/Settings";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [activeTab, setActiveTab] = useState<TabType>("Dashboard");
+
+  // Initialize state from localStorage or system preference
+  const [isDark, setIsDark] = useState(() => {
+    if (typeof window !== "undefined") {
+      const savedTheme = localStorage.getItem("theme");
+      if (savedTheme) return savedTheme === "dark";
+      return window.matchMedia("(prefers-color-scheme: dark)").matches;
+    }
+    return false;
+  });
+
+  // Handle Dark Mode Toggle with Persistence
+  useEffect(() => {
+    const root = window.document.documentElement;
+    if (isDark) {
+      root.classList.add("dark");
+      localStorage.theme = "dark";
+    } else {
+      root.classList.remove("dark");
+      localStorage.theme = "light";
+    }
+  }, [isDark]);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="min-h-screen bg-gray-50/50 dark:bg-black transition-colors duration-300">
+      <Navbar
+        isDark={isDark}
+        setIsDark={setIsDark}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+      />
+      {activeTab === "Dashboard" && <Dashboard />}
+      {activeTab === "Settings" && <Settings />}
+    </div>
+  );
 }
 
-export default App
+export default App;
