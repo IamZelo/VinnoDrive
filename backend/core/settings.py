@@ -40,7 +40,11 @@ ALLOWED_HOSTS = ["*"]
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
+        # 1. For React App (Bearer Tokens)
         "rest_framework_simplejwt.authentication.JWTAuthentication",
+        
+        # 2. For Browsable API (Cookies/Session)
+        "rest_framework.authentication.SessionAuthentication", 
     ),
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
