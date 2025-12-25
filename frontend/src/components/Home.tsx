@@ -1,40 +1,67 @@
 import Navbar, { type TabType } from "./Navbar";
 import Dashboard from "./Dashboard";
 import Settings from "./Settings";
+import { type UserProfile, getUserProfile } from "../api/userProfile";
+import { logoutUser } from "./auth/Logout";
 
 import { useState, useEffect } from "react";
-
+import { ACCESS_TOKEN } from "../constants";
+import { useNavigate } from "react-router-dom";
+interface UserSession {
+  username: string;
+  token: string;
+}
 const Home = () => {
   const [activeTab, setActiveTab] = useState<TabType>("Dashboard");
-
-  // Initialize state from localStorage or system preference
-  const [isDark, setIsDark] = useState(() => {
-    if (typeof window !== "undefined") {
-      const savedTheme = localStorage.getItem("theme");
-      if (savedTheme) return savedTheme === "dark";
-      return window.matchMedia("(prefers-color-scheme: dark)").matches;
-    }
-    return false;
-  });
-
-  // Handle Dark Mode Toggle with Persistence
+  const [loading, setLoading] = useState<boolean>(true);
+  const [session, setSession] = useState<UserSession | null>(null);
+  const navigate = useNavigate();
   useEffect(() => {
-    const root = window.document.documentElement;
-    if (isDark) {
-      root.classList.add("dark");
-      localStorage.theme = "dark";
-    } else {
-      root.classList.remove("dark");
-      localStorage.theme = "light";
-    }
-  }, [isDark]);
+    const initializeSession = async () => {
+      const token = localStorage.getItem(ACCESS_TOKEN);
+
+      if (token) {
+        try {
+          setLoading(true);
+          // Verify token and get fresh profile data from server
+          const profile = await getUserProfile();
+
+          setSession({ username: profile.username, token });
+        } catch (err) {
+          console.error("Session expired or invalid:", err);
+          localStorage.removeItem("access_token");
+          setSession(null);
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        setLoading(false);
+      }
+    };
+
+    initializeSession();
+  }, []);
+
+  const handleLogout = async () => {
+    await logoutUser();
+    setSession(null);
+    navigate("/login");
+  };
+
+  if (loading) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-gray-50 dark:bg-black">
+        <div className="text-sm text-gray-500">Loading profile...</div>
+      </div>
+    );
+  }
   return (
     <div>
       <Navbar
-        isDark={isDark}
-        setIsDark={setIsDark}
+        session={session}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
+        onLogout={handleLogout}
       />
       {activeTab === "Dashboard" && <Dashboard />}
       {activeTab === "Settings" && <Settings />}

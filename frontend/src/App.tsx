@@ -4,10 +4,11 @@ import { Routes, Route } from "react-router-dom";
 
 import Home from "./components/Home";
 import Login from "./components/auth/LoginPage";
-import Logout from "./components/auth/LogoutPage";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
+import useTheme from "./components/utils/useTheme";
 
 function App() {
+  useTheme();
   return (
     <div className="min-h-screen bg-gray-50/50 dark:bg-black transition-colors duration-300">
       <Routes>
@@ -21,14 +22,6 @@ function App() {
         />
 
         <Route path="/login" element={<Login />} />
-        <Route
-          path="/logout"
-          element={
-            <ProtectedRoute>
-              <Logout />
-            </ProtectedRoute>
-          }
-        />
       </Routes>
     </div>
   );
