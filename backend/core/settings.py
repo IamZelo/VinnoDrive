@@ -43,8 +43,7 @@ REST_FRAMEWORK = {
         # 1. For React App (Bearer Tokens)
         "rest_framework_simplejwt.authentication.JWTAuthentication",
         
-        # 2. For Browsable API (Cookies/Session)
-        "rest_framework.authentication.SessionAuthentication", 
+        
     ),
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
@@ -52,7 +51,7 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
 }
 
@@ -66,8 +65,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
     'drive',
-    'api',
+    'user',
     'rest_framework',
     'corsheaders',
 ]
