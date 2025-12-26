@@ -26,7 +26,7 @@ export default function NavButton({
       `}
     >
       {icon}
-      {label}
+      <div className="hidden md:block">{label}</div>
     </button>
   );
 }

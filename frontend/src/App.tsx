@@ -10,7 +10,7 @@ import useTheme from "./components/utils/useTheme";
 function App() {
   useTheme();
   return (
-    <div className="min-h-screen bg-gray-50/50 dark:bg-black transition-colors duration-300">
+    <div className="min-w-[375px] min-h-screen bg-gray-50/50 dark:bg-black transition-colors duration-300">
       <Routes>
         <Route
           path="/"

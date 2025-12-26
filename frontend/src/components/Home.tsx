@@ -1,7 +1,8 @@
 import Navbar, { type TabType } from "./Navbar";
 import Dashboard from "./Dashboard";
+import MyFiles from "./MyFiles";
 import Settings from "./Settings";
-import { type UserProfile, getUserProfile } from "../api/userProfile";
+import { getUserProfile } from "../api/userProfile";
 import { logoutUser } from "./auth/Logout";
 
 import { useState, useEffect } from "react";
@@ -64,6 +65,7 @@ const Home = () => {
         onLogout={handleLogout}
       />
       {activeTab === "Dashboard" && <Dashboard />}
+      {activeTab === "My Files" && <MyFiles />}
       {activeTab === "Settings" && <Settings />}
     </div>
   );
