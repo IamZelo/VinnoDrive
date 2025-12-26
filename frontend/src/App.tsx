@@ -1,46 +1,30 @@
 import "./App.css";
 
-import Navbar, { type TabType } from "./components/Navbar";
-import Dashboard from "./components/Dashboard";
+import { Routes, Route } from "react-router-dom";
 
-import { useState, useEffect } from "react";
-import Settings from "./components/Settings";
+import Home from "./components/Home";
+import Login from "./components/auth/LoginPage";
+import Register from "./components/auth/RegisterPage";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
+import useTheme from "./components/utils/useTheme";
 
 function App() {
-  const [activeTab, setActiveTab] = useState<TabType>("Dashboard");
-
-  // Initialize state from localStorage or system preference
-  const [isDark, setIsDark] = useState(() => {
-    if (typeof window !== "undefined") {
-      const savedTheme = localStorage.getItem("theme");
-      if (savedTheme) return savedTheme === "dark";
-      return window.matchMedia("(prefers-color-scheme: dark)").matches;
-    }
-    return false;
-  });
-
-  // Handle Dark Mode Toggle with Persistence
-  useEffect(() => {
-    const root = window.document.documentElement;
-    if (isDark) {
-      root.classList.add("dark");
-      localStorage.theme = "dark";
-    } else {
-      root.classList.remove("dark");
-      localStorage.theme = "light";
-    }
-  }, [isDark]);
-
+  useTheme();
   return (
-    <div className="min-h-screen bg-gray-50/50 dark:bg-black transition-colors duration-300">
-      <Navbar
-        isDark={isDark}
-        setIsDark={setIsDark}
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-      />
-      {activeTab === "Dashboard" && <Dashboard />}
-      {activeTab === "Settings" && <Settings />}
+    <div className="min-w-[375px] min-h-screen bg-gray-50/50 dark:bg-black transition-colors duration-300">
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+      </Routes>
     </div>
   );
 }
