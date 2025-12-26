@@ -1,7 +1,7 @@
 import { LayoutDashboard, Folder } from "lucide-react";
 import ThemeToggle from "./utils/ThemeToggle";
-import NavButton from "./NavButton";
-import UserMenu from "./UserMenu";
+import NavButton from "./utils/NavButton";
+import UserMenu from "./profile/UserMenu";
 
 // --- Types ---
 type TabType = "Dashboard" | "Settings" | "My Files";

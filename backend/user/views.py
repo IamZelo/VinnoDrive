@@ -8,6 +8,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.generics import RetrieveAPIView
 from .serializers import UserProfileSerializer
+from core.throttles import TwoSecondThrottle
 
 class CreateUserView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -37,6 +38,7 @@ class UserProfileView(RetrieveAPIView):
     Securely returns the current user's details based on the JWT token.
     """
     permission_classes = [IsAuthenticated]
+    throttle_classes = [TwoSecondThrottle]
     serializer_class = UserProfileSerializer
 
     def get_object(self):

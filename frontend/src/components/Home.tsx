@@ -1,13 +1,14 @@
 import Navbar, { type TabType } from "./Navbar";
 import Dashboard from "./Dashboard";
-import MyFiles from "./MyFiles";
-import Settings from "./Settings";
+import MyFiles from "./drive/MyFiles";
+import Settings from "./profile/Settings";
 import { getUserProfile } from "../api/userProfile";
 import { logoutUser } from "./auth/Logout";
 
 import { useState, useEffect } from "react";
 import { ACCESS_TOKEN } from "../constants";
 import { useNavigate } from "react-router-dom";
+import Loader from "./utils/Loader";
 interface UserSession {
   username: string;
   token: string;
@@ -50,11 +51,7 @@ const Home = () => {
   };
 
   if (loading) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-gray-50 dark:bg-black">
-        <div className="text-sm text-gray-500">Loading profile...</div>
-      </div>
-    );
+    return <Loader text="Loading profile" />;
   }
   return (
     <div>
