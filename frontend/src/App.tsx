@@ -4,6 +4,7 @@ import { Routes, Route } from "react-router-dom";
 
 import Home from "./components/Home";
 import Login from "./components/auth/LoginPage";
+import Register from "./components/auth/RegisterPage";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import useTheme from "./components/utils/useTheme";
 
@@ -22,6 +23,7 @@ function App() {
         />
 
         <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
       </Routes>
     </div>
   );

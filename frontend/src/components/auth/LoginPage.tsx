@@ -2,6 +2,7 @@ import { useState, useEffect, type FormEvent } from "react";
 import api from "../../api";
 import { useNavigate, Link } from "react-router-dom";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../../constants";
+import { GridLoader } from "react-spinners";
 
 function Login() {
   const [username, setUsername] = useState<string>("");
@@ -115,14 +116,15 @@ function Login() {
             <button
               type="submit"
               disabled={loading}
-              className={`w-full rounded-xl px-4 py-3 text-sm font-bold text-white transition-all duration-200 
-                ${
-                  loading
-                    ? "cursor-not-allowed opacity-70 bg-blue-600"
-                    : "bg-blue-600 hover:bg-blue-700 active:scale-[0.98] shadow-lg shadow-blue-500/20 dark:shadow-blue-900/30"
-                }`}
+              className={`w-full h-12 rounded-xl px-4 mt-2 text-sm font-bold text-white transition-all duration-200 ${
+                loading
+                  ? "cursor-not-allowed opacity-70 bg-blue-600"
+                  : "bg-blue-600 hover:bg-blue-700 active:scale-[0.98] shadow-lg shadow-blue-500/20"
+              }`}
             >
-              {loading ? "Signing in..." : "Sign In"}
+              <div className="flex items-center justify-center h-full">
+                {loading ? <GridLoader size={6} color="white" /> : "Sign in"}
+              </div>
             </button>
           </form>
 
