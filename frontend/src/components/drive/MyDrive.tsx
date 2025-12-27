@@ -1,7 +1,7 @@
 import React from "react";
 
-const MyFiles = () => {
+const MyDrive = () => {
   return <div>MyFiles</div>;
 };
 
-export default MyFiles;
+export default MyDrive;

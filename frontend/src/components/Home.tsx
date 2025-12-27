@@ -1,6 +1,6 @@
-import Navbar, { type TabType } from "./Navbar";
-import Dashboard from "./Dashboard";
-import MyFiles from "./drive/MyFiles";
+import Navbar, { type TabType } from "./ui/Navbar";
+import Dashboard from "./pages/Dashboard";
+import MyDrive from "./drive/MyDrive";
 import Settings from "./profile/Settings";
 import { getUserProfile } from "../api/userProfile";
 import { logoutUser } from "./auth/Logout";
@@ -8,7 +8,7 @@ import { logoutUser } from "./auth/Logout";
 import { useState, useEffect } from "react";
 import { ACCESS_TOKEN } from "../constants";
 import { useNavigate } from "react-router-dom";
-import Loader from "./utils/Loader";
+import Loader from "./ui/Loader";
 interface UserSession {
   username: string;
   token: string;
@@ -61,9 +61,11 @@ const Home = () => {
         setActiveTab={setActiveTab}
         onLogout={handleLogout}
       />
-      {activeTab === "Dashboard" && <Dashboard />}
-      {activeTab === "My Files" && <MyFiles />}
-      {activeTab === "Settings" && <Settings />}
+      <div className=" flex flex-col justify-between items-center">
+        {activeTab === "Dashboard" && <Dashboard />}
+        {activeTab === "My Drive" && <MyDrive />}
+        {activeTab === "Settings" && <Settings />}
+      </div>
     </div>
   );
 };

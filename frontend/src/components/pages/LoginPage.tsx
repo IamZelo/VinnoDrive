@@ -1,5 +1,5 @@
 import { useState, useEffect, type FormEvent } from "react";
-import api from "../../api";
+import api from "../../api/api";
 import { useNavigate, Link } from "react-router-dom";
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../../constants";
 import { GridLoader } from "react-spinners";
