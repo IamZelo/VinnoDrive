@@ -1,20 +1,22 @@
 import {
   ChevronRight,
+  Copy,
   Download,
   FolderIcon,
   Share2,
   Trash2,
 } from "lucide-react";
-import formatSize from "../../../utils/formats";
+import { formatSize } from "../../../utils/formats";
 import { FileIcon } from "../../ui/FileIcon";
 import type { ViewItem } from "../../../types/drive";
 
 interface Props {
   viewItems: ViewItem[];
   handleNavigate: (path: string) => void;
+  handleFileClick: (viewItem: ViewItem) => void;
 }
 
-const ListView = ({ viewItems, handleNavigate }: Props) => {
+const ListView = ({ viewItems, handleNavigate, handleFileClick }: Props) => {
   return (
     <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 overflow-hidden shadow-sm">
       <table className="w-full text-left text-sm">
@@ -24,7 +26,7 @@ const ListView = ({ viewItems, handleNavigate }: Props) => {
             <th className="px-6 py-4">Name</th>
             <th className="px-6 py-4">Size</th>
             <th className="px-6 py-4">Status</th>
-            <th className="px-6 py-4 text-right">Actions</th>
+            <th className="hidden md:block px-6 py-4 text-right">Actions</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-50 dark:divide-zinc-800">
@@ -33,7 +35,10 @@ const ListView = ({ viewItems, handleNavigate }: Props) => {
               return (
                 <tr
                   key={item.path}
-                  onClick={() => handleNavigate(item.path)}
+                  onClick={() => {
+                    handleNavigate(item.path);
+                    handleFileClick(item);
+                  }}
                   className="hover:bg-blue-50/50 dark:hover:bg-blue-900/10 cursor-pointer transition-colors"
                 >
                   <td className="px-6 py-4">
@@ -49,7 +54,7 @@ const ListView = ({ viewItems, handleNavigate }: Props) => {
                   <td className="px-6 py-4 text-xs text-blue-600 dark:text-blue-400">
                     {item.itemCount} items
                   </td>
-                  <td className="px-6 py-4 text-right">
+                  <td className="hidden md:block px-6 py-4 text-right">
                     <ChevronRight size={16} className="ml-auto text-gray-400" />
                   </td>
                 </tr>
@@ -59,6 +64,7 @@ const ListView = ({ viewItems, handleNavigate }: Props) => {
               return (
                 <tr
                   key={file.id}
+                  onClick={() => handleFileClick(item)}
                   className="hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors"
                 >
                   <td className="px-6 py-4">
@@ -76,13 +82,13 @@ const ListView = ({ viewItems, handleNavigate }: Props) => {
                   <td className="px-6 py-4">
                     {file.is_duplicate ? (
                       <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400">
-                        <Share2 size={12} /> Saved
+                        <Copy size={12} /> Referenced
                       </span>
                     ) : (
                       <span className="text-gray-400 text-xs">Unique</span>
                     )}
                   </td>
-                  <td className="px-6 py-4 text-right">
+                  <td className="hidden md:block px-6 py-4 text-right">
                     <div className="flex justify-end gap-2">
                       <a
                         href={file.download_url}
@@ -92,6 +98,9 @@ const ListView = ({ viewItems, handleNavigate }: Props) => {
                       >
                         <Download size={18} />
                       </a>
+                      <button className="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-400 hover:text-green-600 rounded-lg transition-colors">
+                        <Share2 size={18} />
+                      </button>
                       <button className="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-400 hover:text-red-600 rounded-lg transition-colors">
                         <Trash2 size={18} />
                       </button>

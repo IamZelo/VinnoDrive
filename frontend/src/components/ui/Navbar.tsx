@@ -1,6 +1,6 @@
 import { LayoutDashboard, Folder } from "lucide-react";
-import ThemeToggle from "./ThemeToggle";
-import NavButton from "./NavButton";
+import ThemeToggle from "./Buttons/ThemeToggle";
+import NavButton from "./Buttons/NavButton";
 import UserMenu from "../profile/UserMenu";
 
 // --- Types ---

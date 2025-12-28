@@ -13,6 +13,7 @@ import type {
 import { fetchFiles } from "../../api/fetchFiles";
 import Toolbar from "../dashboard/Toolbar";
 import ContentArea from "../dashboard/ContentArea";
+import InfoView from "../ui/InfoView";
 
 export default function Dashboard() {
   const [files, setFiles] = useState<FileItem[]>([]);
@@ -20,6 +21,7 @@ export default function Dashboard() {
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPath, setCurrentPath] = useState<string>("");
+  const [currentFile, setCurrentFile] = useState<ViewItem | null>(null);
 
   const loadFiles = async () => {
     const data = await fetchFiles();
@@ -45,6 +47,7 @@ export default function Dashboard() {
 
     // 1. Searching: Flatten view
     if (isSearching) {
+      setCurrentFile(null);
       const matches = files
         .filter((f) =>
           f.filename.toLowerCase().includes(searchQuery.toLowerCase())
@@ -101,15 +104,28 @@ export default function Dashboard() {
     setSearchQuery("");
   };
 
+  const handleFileClick = (file: ViewItem) => {
+    setCurrentFile(file);
+  };
+
   if (loading) {
     return <Loader text="Loading drive" />;
   }
 
   return (
-    <div className="flex flex-col w-full  max-w-450 mx-auto px-4 py-5 space-y-6 animate-in fade-in duration-500">
+    <div className="flex flex-col w-full  max-w-450 mx-auto px-4 py-5 space-y-6 animate-in ">
       <Stats files={files} />
 
-      <div className="flex gap-3 items-start">
+      <div
+        className={`
+  gap-3 items-stretch
+  ${
+    viewMode === "list" && currentFile
+      ? "flex flex-col" //
+      : "grid md:flex" //
+  }
+`}
+      >
         <div className="bg-white dark:bg-zinc-900 p-6 rounded-2xl border border-gray-100 dark:border-zinc-800 shadow-sm flex flex-col flex-grow gap-6">
           <Toolbar
             currentPath={currentPath}
@@ -120,20 +136,27 @@ export default function Dashboard() {
             setViewMode={setViewMode}
             loadFiles={loadFiles}
             isSearching={isSearching}
+            setCurrentFile={setCurrentFile}
           />
           <ContentArea
             viewItems={viewItems}
             viewMode={viewMode}
             isSearching={isSearching}
             handleNavigate={handleNavigate}
+            handleFileClick={handleFileClick}
           />
         </div>
 
-        <div className="shrink-0 w-60 md:w-80 bg-white dark:bg-zinc-900 p-6 rounded-2xl border border-gray-100 dark:border-zinc-800 shadow-sm flex flex-col animate-in fade-in duration-500">
-          <div className="space-y-6">
-            <h3 className="font-bold text-lg">File Info</h3>
-          </div>
-        </div>
+        {currentFile &&
+          (viewMode === "list" ? (
+            <div className="shrink-0 flex order-first">
+              <InfoView viewItem={currentFile} />
+            </div>
+          ) : (
+            <div className="shrink-0 w-full md:w-60 lg:w-80 flex flex-col order-first md:order-none">
+              <InfoView viewItem={currentFile} />
+            </div>
+          ))}
       </div>
     </div>
   );

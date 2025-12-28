@@ -10,7 +10,7 @@ import {
   ListIcon,
   UploadCloud,
 } from "lucide-react";
-import type { ViewMode } from "../../types/drive";
+import type { ViewItem, ViewMode } from "../../types/drive";
 import { ExpandableSearch } from "../ui/ExpandableSearch";
 
 interface NavProps {
@@ -22,6 +22,7 @@ interface NavProps {
   setViewMode: (query: ViewMode) => void;
   loadFiles: () => void;
   isSearching: boolean;
+  setCurrentFile: (viewItem: ViewItem | null) => void;
 }
 
 const Toolbar = ({
@@ -33,6 +34,7 @@ const Toolbar = ({
   setViewMode,
   loadFiles,
   isSearching,
+  setCurrentFile,
 }: NavProps) => {
   const handleNavigateUp = () => {
     if (currentPath === "") return;
@@ -40,6 +42,7 @@ const Toolbar = ({
     parts.pop();
     const newPath = parts.length > 0 ? parts.join("/") + "/" : "";
     setCurrentPath(newPath);
+    setCurrentFile(null);
   };
 
   // --- CREATE FOLDER LOGIC ---
@@ -109,7 +112,10 @@ const Toolbar = ({
     return (
       <div className="flex items-center gap-1 text-sm font-medium text-gray-600 dark:text-gray-300 overflow-x-auto">
         <button
-          onClick={() => setCurrentPath("")}
+          onClick={() => {
+            setCurrentPath("");
+            setCurrentFile(null);
+          }}
           className={`p-1 rounded hover:bg-gray-200 dark:hover:bg-zinc-800 transition-colors ${
             currentPath === "" ? "text-blue-600 dark:text-blue-400" : ""
           }`}

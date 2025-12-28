@@ -1,5 +1,5 @@
 import { FolderIcon, Search } from "lucide-react";
-import type { ViewItem, ViewMode } from "../../types/drive";
+import type { FileItem, ViewItem, ViewMode } from "../../types/drive";
 import GridView from "./views/GridView";
 import ListView from "./views/ListView";
 
@@ -8,6 +8,7 @@ interface ContentAreaProps {
   viewMode: ViewMode;
   isSearching: boolean;
   handleNavigate: (path: string) => void;
+  handleFileClick: (viewItem: ViewItem) => void;
 }
 
 const ContentArea = ({
@@ -15,6 +16,7 @@ const ContentArea = ({
   isSearching,
   viewMode,
   handleNavigate,
+  handleFileClick,
 }: ContentAreaProps) => {
   return (
     <>
@@ -40,10 +42,18 @@ const ContentArea = ({
         <>
           {viewMode === "grid" ? (
             // --- GRID VIEW ---
-            <GridView viewItems={viewItems} handleNavigate={handleNavigate} />
+            <GridView
+              viewItems={viewItems}
+              handleNavigate={handleNavigate}
+              handleFileClick={handleFileClick}
+            />
           ) : (
             // --- LIST VIEW ---
-            <ListView viewItems={viewItems} handleNavigate={handleNavigate} />
+            <ListView
+              viewItems={viewItems}
+              handleNavigate={handleNavigate}
+              handleFileClick={handleFileClick}
+            />
           )}
         </>
       )}

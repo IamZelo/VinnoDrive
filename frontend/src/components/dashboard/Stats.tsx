@@ -1,6 +1,6 @@
 import { File, HardDrive, Share2, PieChart } from "lucide-react";
 
-import formatSize from "../../utils/formats";
+import { formatSize } from "../../utils/formats";
 import { type FileItem } from "../../types/drive";
 
 // --- Configuration ---
