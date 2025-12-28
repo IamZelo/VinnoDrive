@@ -8,15 +8,23 @@ import {
 } from "lucide-react";
 import { formatSize } from "../../../utils/formats";
 import { FileIcon } from "../../ui/FileIcon";
-import type { ViewItem } from "../../../types/drive";
+import type { FileItem, ViewItem } from "../../../types/drive";
 
 interface Props {
   viewItems: ViewItem[];
   handleNavigate: (path: string) => void;
   handleFileClick: (viewItem: ViewItem) => void;
+  handleDelete: (fileItem: FileItem) => void;
+  handleDownload: (fileItem: FileItem) => void;
 }
 
-const ListView = ({ viewItems, handleNavigate, handleFileClick }: Props) => {
+const ListView = ({
+  viewItems,
+  handleNavigate,
+  handleFileClick,
+  handleDelete,
+  handleDownload,
+}: Props) => {
   return (
     <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-gray-100 dark:border-zinc-800 overflow-hidden shadow-sm">
       <table className="w-full text-left text-sm">
@@ -90,18 +98,25 @@ const ListView = ({ viewItems, handleNavigate, handleFileClick }: Props) => {
                   </td>
                   <td className="hidden md:block px-6 py-4 text-right">
                     <div className="flex justify-end gap-2">
-                      <a
-                        href={file.download_url}
-                        target="_blank"
-                        rel="noreferrer"
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDownload(file);
+                        }}
                         className="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-400 hover:text-blue-600 rounded-lg transition-colors"
                       >
                         <Download size={18} />
-                      </a>
+                      </button>
                       <button className="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-400 hover:text-green-600 rounded-lg transition-colors">
                         <Share2 size={18} />
                       </button>
-                      <button className="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-400 hover:text-red-600 rounded-lg transition-colors">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(file);
+                        }}
+                        className="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-400 hover:text-red-600 rounded-lg transition-colors"
+                      >
                         <Trash2 size={18} />
                       </button>
                     </div>

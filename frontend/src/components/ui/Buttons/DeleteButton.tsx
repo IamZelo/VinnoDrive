@@ -3,12 +3,10 @@ interface Props {
   handleDelete: () => void;
 }
 
-export default function DownloadButton({ handleDelete }: Props) {
+export default function DeleteButton({ handleDelete }: Props) {
   return (
-    <a
+    <button
       onClick={handleDelete}
-      target="_blank"
-      rel="noreferrer"
       className="
         flex
         items-center 
@@ -35,6 +33,6 @@ export default function DownloadButton({ handleDelete }: Props) {
       "
     >
       Delete <Trash2 className="w-3 h-3" />
-    </a>
+    </button>
   );
 }

@@ -7,9 +7,17 @@ interface Props {
   viewItems: ViewItem[];
   handleNavigate: (path: string) => void;
   handleFileClick: (viewItem: ViewItem) => void;
+  handleDelete: (fileItem: FileItem) => void;
+  handleDownload: (fileItem: FileItem) => void;
 }
 
-const GridView = ({ viewItems, handleNavigate, handleFileClick }: Props) => {
+const GridView = ({
+  viewItems,
+  handleNavigate,
+  handleFileClick,
+  handleDelete,
+  handleDownload,
+}: Props) => {
   const createFolderItems = () => {
     return viewItems.map((item) => {
       if (item.type === "folder") {
@@ -81,15 +89,15 @@ const GridView = ({ viewItems, handleNavigate, handleFileClick }: Props) => {
               </div>
             </div>
             <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
-              <a
-                href={file.download_url}
-                target="_blank"
-                rel="noreferrer"
+              <button
                 className="p-1.5 bg-white dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 rounded-lg shadow-sm hover:text-blue-600"
-                onClick={(e) => e.stopPropagation()}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDownload(file);
+                }}
               >
                 <Download size={14} />
-              </a>
+              </button>
 
               <a
                 href={"/share"}
@@ -101,15 +109,15 @@ const GridView = ({ viewItems, handleNavigate, handleFileClick }: Props) => {
                 <Share2 size={14} />
               </a>
 
-              <a
-                href={"/delete"}
-                target="_blank"
-                rel="noreferrer"
-                className="p-1.5 bg-white dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 rounded-lg shadow-sm hover:text-blue-600"
-                onClick={(e) => e.stopPropagation()}
+              <button
+                className="p-1.5 bg-white dark:bg-zinc-800 text-gray-600 dark:text-zinc-300 rounded-lg shadow-sm hover:text-red-600"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDelete(file);
+                }}
               >
                 <Trash2 size={14} />
-              </a>
+              </button>
             </div>
           </div>
         );

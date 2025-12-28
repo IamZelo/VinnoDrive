@@ -9,6 +9,7 @@ import {
   Info,
   UsersRound,
   Folder,
+  X,
 } from "lucide-react";
 import DownloadButton from "./Buttons/DownloadButton";
 import ShareButton from "./Buttons/ShareButton";
@@ -16,17 +17,41 @@ import DeleteButton from "./Buttons/DeleteButton";
 
 interface Props {
   viewItem: ViewItem | null;
+  handleDelete: (fileItem: FileItem) => void;
+  setCurrentFile: (fileItem: ViewItem | null) => void;
+  handleDownload: (fileItem: FileItem) => void;
 }
 
-const InfoView = ({ viewItem }: Props) => {
+const InfoView = ({
+  viewItem,
+  handleDelete,
+  setCurrentFile,
+  handleDownload,
+}: Props) => {
   const FileView = (fileItem: FileItem) => {
     return (
       <div className="space-y-4 gap-2">
-        <div className="flex items-center gap-2 pb-2 border-b border-gray-100 dark:border-zinc-800">
-          <Info size={18} className="text-blue-500" />
-          <h3 className="font-bold text-gray-900 dark:text-gray-100">
-            File Info
-          </h3>
+        <div className="flex justify-between pb-3 border-b border-gray-100 dark:border-zinc-800">
+          <div className="flex gap-2 items-center">
+            <Info size={18} className="text-blue-500" />
+            <h3 className="font-bold text-gray-900 dark:text-gray-100">
+              File Info
+            </h3>
+          </div>
+          <div>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setCurrentFile(null);
+              }}
+              className="transform transition duration-50 hover:scale-120 ease-in-out"
+            >
+              <X
+                size={18}
+                className="text-gray-900 dark:text-gray-100 hover:text-red-600"
+              />
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-2 gap-8">
@@ -121,14 +146,18 @@ const InfoView = ({ viewItem }: Props) => {
         {/* Buttons */}
         <div className="flex shrink-0 gap-3">
           <div className="group cursor-pointer">
-            <DownloadButton download_url={fileItem.download_url} />
+            <DownloadButton onClick={() => handleDownload(fileItem)} />
           </div>
           {/* To do create share systemm */}
           <div className="group cursor-pointer">
             <ShareButton share_url={"share/"} />
           </div>
           <div className="group cursor-pointer">
-            <DeleteButton handleDelete={() => {}} />
+            <DeleteButton
+              handleDelete={() => {
+                handleDelete(fileItem);
+              }}
+            />
           </div>
         </div>
       </div>

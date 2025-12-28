@@ -29,7 +29,6 @@ def upload_file(request):
     """
     Handles file upload with deduplication logic.
     """
-    # 1. CALL SERIALIZER TO VALIDATE METADATA
     # We validate the hash/filename before even looking at the file content
     meta_serializer = FileUploadSerializer(data=request.data)
     
@@ -44,9 +43,8 @@ def upload_file(request):
     if not uploaded_file:
         return Response({"error": "No file provided"}, status=status.HTTP_400_BAD_REQUEST)
 
-    # 2. DEDUPLICATION LOGIC
     with transaction.atomic():
-        # Check if the blob already exists (Smart Deduplication)
+        # Check if the blob already exists
         blob, created = PhysicalBlob.objects.get_or_create(
             sha256_hash=file_hash,
             defaults={
@@ -56,14 +54,10 @@ def upload_file(request):
             }
         )
 
-        # If it existed, we just increment the reference count
-        # If it's new, the 'defaults' block above handled the file save
-        # This generates SQL: UPDATE physical_blob SET ref_count = ref_count + 1
+        # Store reference count
         blob.ref_count = F('ref_count') + 1
         blob.save()
 
-        # Since F() is a SQL instruction, if you need to access the value immediately 
-        # after saving, you must refresh the object:
         blob.refresh_from_db()
 
         # Create the user's reference to this blob
@@ -78,3 +72,45 @@ def upload_file(request):
     response_serializer = FileReferenceSerializer(file_ref, context={'request': request})
     
     return Response(response_serializer.data, status=status.HTTP_201_CREATED)
+
+
+@api_view(['DELETE'])
+def delete_file(request, file_id):
+    """
+    Handles file deletion with reference counting logic.
+    """
+    print(file_id)
+    try:
+        # Ensure only the owner can delete their reference
+        file_ref = FileReference.objects.get(id=file_id, user=request.user)
+    except FileReference.DoesNotExist:
+        return Response(
+            {"error": "File not found or unauthorized"}, 
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    # Get the associated blob before we delete the reference
+    blob = file_ref.blob
+
+    with transaction.atomic():
+        # Delete user reference
+        file_ref.delete()
+
+        # Decrement blob count
+        blob.ref_count = F('ref_count') - 1
+        blob.save()
+        
+        # Refresh to get the actual value for the zero-check
+        blob.refresh_from_db()
+
+        # If no one else is pointing to this blob, delete it and the physical file
+        if blob.ref_count <= 0:
+            blob.file.delete(save=False)
+            
+            # Delete the blob record entirely
+            blob.delete()
+
+    return Response(
+        {"message": "File removed successfully"}, 
+        status=status.HTTP_204_NO_CONTENT
+    )

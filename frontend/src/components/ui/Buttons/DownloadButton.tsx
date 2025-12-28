@@ -1,15 +1,15 @@
 import { Download } from "lucide-react";
 interface Props {
-  download_url: string;
+  onClick: () => void;
 }
 
-export default function DownloadButton({ download_url }: Props) {
+export default function DownloadButton({ onClick }: Props) {
   return (
-    <a
-      href={download_url}
-      target="_blank"
-      rel="noreferrer"
-      onClick={(e) => e.stopPropagation()}
+    <button
+      onClick={(e) => {
+        e.stopPropagation();
+        onClick();
+      }}
       className="
         flex
         items-center 
@@ -36,6 +36,6 @@ export default function DownloadButton({ download_url }: Props) {
       "
     >
       Download <Download className="w-3 h-3" />
-    </a>
+    </button>
   );
 }

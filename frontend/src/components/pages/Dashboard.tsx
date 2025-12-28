@@ -10,7 +10,7 @@ import type {
   FileViewItem,
   ViewItem,
 } from "../../types/drive";
-import { fetchFiles } from "../../api/fetchFiles";
+import { deleteFile, downloadFile, fetchFiles } from "../../api/files";
 import Toolbar from "../dashboard/Toolbar";
 import ContentArea from "../dashboard/ContentArea";
 import InfoView from "../ui/InfoView";
@@ -40,6 +40,23 @@ export default function Dashboard() {
   const handleSearch = useCallback((query: string) => {
     setSearchQuery(query);
   }, []);
+
+  const handleDelete = async (fileItem: FileItem) => {
+    setFiles((prevFiles) => prevFiles.filter((f) => f.id !== fileItem.id));
+    try {
+      if (currentFile?.type === "file" && currentFile.data.id === fileItem.id) {
+        setCurrentFile(null);
+      }
+      await deleteFile(fileItem.id);
+    } catch (error) {
+      console.error("Delete failed", error);
+      loadFiles();
+      alert("Failed to delete file");
+    }
+  };
+  const handleDownload = async (fileItem: FileItem) => {
+    downloadFile(fileItem);
+  };
 
   // --- Virtual Folder Logic ---
   const { viewItems, isSearching } = useMemo(() => {
@@ -112,19 +129,23 @@ export default function Dashboard() {
     return <Loader text="Loading drive" />;
   }
 
+  const sidePanelClasses =
+    viewMode === "list"
+      ? "shrink-0 flex order-first" // List View
+      : "shrink-0 w-full md:w-60 lg:w-80 flex flex-col order-first md:order-none"; // Grid View
+
   return (
     <div className="flex flex-col w-full  max-w-450 mx-auto px-4 py-5 space-y-6 animate-in ">
       <Stats files={files} />
 
       <div
-        className={`
-  gap-3 items-stretch
-  ${
-    viewMode === "list" && currentFile
-      ? "flex flex-col" //
-      : "grid md:flex" //
-  }
-`}
+        className={`gap-3 items-stretch
+          ${
+            viewMode === "list" && currentFile
+              ? "flex flex-col" //
+              : "grid md:flex" //
+          }
+        `}
       >
         <div className="bg-white dark:bg-zinc-900 p-6 rounded-2xl border border-gray-100 dark:border-zinc-800 shadow-sm flex flex-col flex-grow gap-6">
           <Toolbar
@@ -144,19 +165,21 @@ export default function Dashboard() {
             isSearching={isSearching}
             handleNavigate={handleNavigate}
             handleFileClick={handleFileClick}
+            handleDelete={handleDelete}
+            handleDownload={handleDownload}
           />
         </div>
 
-        {currentFile &&
-          (viewMode === "list" ? (
-            <div className="shrink-0 flex order-first">
-              <InfoView viewItem={currentFile} />
-            </div>
-          ) : (
-            <div className="shrink-0 w-full md:w-60 lg:w-80 flex flex-col order-first md:order-none">
-              <InfoView viewItem={currentFile} />
-            </div>
-          ))}
+        {currentFile && (
+          <div className={sidePanelClasses}>
+            <InfoView
+              viewItem={currentFile}
+              handleDelete={handleDelete}
+              setCurrentFile={setCurrentFile}
+              handleDownload={handleDownload}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

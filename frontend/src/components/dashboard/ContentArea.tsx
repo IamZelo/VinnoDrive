@@ -9,6 +9,8 @@ interface ContentAreaProps {
   isSearching: boolean;
   handleNavigate: (path: string) => void;
   handleFileClick: (viewItem: ViewItem) => void;
+  handleDelete: (fileItem: FileItem) => void;
+  handleDownload: (fileItem: FileItem) => void;
 }
 
 const ContentArea = ({
@@ -17,6 +19,8 @@ const ContentArea = ({
   viewMode,
   handleNavigate,
   handleFileClick,
+  handleDelete,
+  handleDownload,
 }: ContentAreaProps) => {
   return (
     <>
@@ -46,6 +50,8 @@ const ContentArea = ({
               viewItems={viewItems}
               handleNavigate={handleNavigate}
               handleFileClick={handleFileClick}
+              handleDelete={handleDelete}
+              handleDownload={handleDownload}
             />
           ) : (
             // --- LIST VIEW ---
@@ -53,6 +59,8 @@ const ContentArea = ({
               viewItems={viewItems}
               handleNavigate={handleNavigate}
               handleFileClick={handleFileClick}
+              handleDelete={handleDelete}
+              handleDownload={handleDownload}
             />
           )}
         </>
