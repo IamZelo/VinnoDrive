@@ -21,7 +21,8 @@ class FileReferenceSerializer(serializers.ModelSerializer):
             'id', 
             'filename', 
             'size', 
-            'hash', 
+            'hash',
+            'is_primary_uploader', 
             'download_url', 
             'content_type', 
             'upload_timestamp', 
@@ -31,10 +32,10 @@ class FileReferenceSerializer(serializers.ModelSerializer):
 
     def get_is_duplicate(self, obj):
         """
-        Returns True if more than 1 reference points to this blob.
-        This triggers the 'DEDUPLICATED' badge in the UI.
+        Returns True if more than 1 reference points to this blob and if not primary uploader
+        False if ref count is 1
         """
-        return obj.blob.ref_count > 1
+        return obj.blob.ref_count > 1 and (not obj.is_primary_uploader)
 
     def get_download_url(self, obj):
         """

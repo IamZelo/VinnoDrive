@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { User, Settings, LogOut, ChevronDown } from "lucide-react";
 
 interface UserMenuProps {

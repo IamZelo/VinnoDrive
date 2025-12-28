@@ -39,8 +39,11 @@ class FileReference(models.Model):
     # PROTECT ensures we don't accidentally delete the blob while a user still has it
     blob = models.ForeignKey(PhysicalBlob, on_delete=models.PROTECT, related_name='references')
     
-    filename = models.CharField(max_length=255)
+    filename = models.CharField(max_length=1024)
     upload_timestamp = models.DateTimeField(auto_now_add=True)
+    
+    is_primary_uploader = models.BooleanField(default=False)
+    
     
     class Meta:
         ordering = ['-upload_timestamp']

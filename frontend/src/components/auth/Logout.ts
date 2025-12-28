@@ -1,6 +1,6 @@
 import { ACCESS_TOKEN } from "../../constants";
 import { REFRESH_TOKEN } from "../../constants";
-import api from "../../api";
+import api from "../../api/api";
 
 export const logoutUser = async (): Promise<void> => {
   try {

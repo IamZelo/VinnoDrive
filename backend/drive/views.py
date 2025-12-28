@@ -1,3 +1,4 @@
+import os
 from rest_framework.decorators import api_view, parser_classes
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
@@ -6,6 +7,33 @@ from django.db import transaction
 from .models import PhysicalBlob, FileReference
 from .serializers import FileReferenceSerializer, FileUploadSerializer
 from django.db.models import F
+
+def get_unique_filename(user, full_path):
+    """
+    Ensures the path is unique for the current user.
+    If duplicate add a (counter)
+    """
+    # Split path and file name
+    directory, filename = os.path.split(full_path)
+    
+    # Split extension and name
+    name, ext = os.path.splitext(filename)
+    
+    counter = 1
+    unique_path = full_path
+    
+    # 3. Check repeatedly if this user already has a file with this exact path
+    while FileReference.objects.filter(user=user, filename=unique_path).exists():
+        # Create new name: image(1).png
+        new_filename = f"{name}({counter}){ext}"
+        
+        # Recombine: folder/subfolder/image(1).png
+        unique_path = os.path.join(directory, new_filename).replace("\\", "/")
+        counter += 1
+        
+    return unique_path
+
+
 
 @api_view(['GET'])
 def get_files(request):
@@ -29,8 +57,7 @@ def upload_file(request):
     """
     Handles file upload with deduplication logic.
     """
-    # 1. CALL SERIALIZER TO VALIDATE METADATA
-    # We validate the hash/filename before even looking at the file content
+    # Validate the hash/filename before even looking at the file content
     meta_serializer = FileUploadSerializer(data=request.data)
     
     if not meta_serializer.is_valid():
@@ -43,10 +70,11 @@ def upload_file(request):
 
     if not uploaded_file:
         return Response({"error": "No file provided"}, status=status.HTTP_400_BAD_REQUEST)
+    
+    unqiue_filename = get_unique_filename(request.user, filename)
 
-    # 2. DEDUPLICATION LOGIC
     with transaction.atomic():
-        # Check if the blob already exists (Smart Deduplication)
+        # Check if the blob already exists
         blob, created = PhysicalBlob.objects.get_or_create(
             sha256_hash=file_hash,
             defaults={
@@ -56,21 +84,18 @@ def upload_file(request):
             }
         )
 
-        # If it existed, we just increment the reference count
-        # If it's new, the 'defaults' block above handled the file save
-        # This generates SQL: UPDATE physical_blob SET ref_count = ref_count + 1
+        # Store reference count
         blob.ref_count = F('ref_count') + 1
         blob.save()
 
-        # Since F() is a SQL instruction, if you need to access the value immediately 
-        # after saving, you must refresh the object:
         blob.refresh_from_db()
 
         # Create the user's reference to this blob
         file_ref = FileReference.objects.create(
             user=request.user,
             blob=blob,
-            filename=filename
+            filename = unqiue_filename,
+            is_primary_uploader = created
         )
 
     # 3. CALL SERIALIZER FOR RESPONSE
@@ -78,3 +103,53 @@ def upload_file(request):
     response_serializer = FileReferenceSerializer(file_ref, context={'request': request})
     
     return Response(response_serializer.data, status=status.HTTP_201_CREATED)
+
+
+@api_view(['DELETE'])
+def delete_file(request, file_id):
+    """
+    Handles file deletion with reference counting logic.
+    """
+    print(file_id)
+    try:
+        # Ensure only the owner can delete their reference
+        file_ref = FileReference.objects.get(id=file_id, user=request.user)
+    except FileReference.DoesNotExist:
+        return Response(
+            {"error": "File not found or unauthorized"}, 
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    # Get the associated blob before we delete the reference
+    blob = file_ref.blob
+
+    with transaction.atomic():
+        # Delete user reference
+        file_ref.delete()
+
+        # Decrement blob count
+        blob.ref_count = F('ref_count') - 1
+        blob.save()
+        
+        # Refresh to get the actual value for the zero-check
+        blob.refresh_from_db()
+
+        if blob.ref_count == 1:
+            # Find last surviving reference
+            last_survivor = FileReference.objects.filter(blob=blob).first()
+            if last_survivor:
+                # Promote them to Primary
+                last_survivor.is_primary_uploader = True
+                last_survivor.save()
+
+        # If no one else is pointing to this blob, delete it and the physical file
+        if blob.ref_count <= 0:
+            blob.file.delete(save=False)
+            
+            # Delete the blob record entirely
+            blob.delete()
+
+    return Response(
+        {"message": "File removed successfully"}, 
+        status=status.HTTP_204_NO_CONTENT
+    )

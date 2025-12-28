@@ -7,4 +7,5 @@ urlpatterns = [
     
     # Endpoint to upload a new file (with deduplication logic)
     path('upload/', views.upload_file, name='upload_file'),
+    path("delete/<str:file_id>/", views.delete_file, name="delete_file"),
 ]

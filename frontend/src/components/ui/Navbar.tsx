@@ -1,10 +1,10 @@
 import { LayoutDashboard, Folder } from "lucide-react";
-import ThemeToggle from "./utils/ThemeToggle";
-import NavButton from "./utils/NavButton";
-import UserMenu from "./profile/UserMenu";
+import ThemeToggle from "./Buttons/ThemeToggle";
+import NavButton from "./Buttons/NavButton";
+import UserMenu from "../profile/UserMenu";
 
 // --- Types ---
-type TabType = "Dashboard" | "Settings" | "My Files";
+type TabType = "Dashboard" | "Settings" | "My Drive";
 
 interface NavbarProps {
   session: { username: string; token: string } | null;
@@ -21,11 +21,11 @@ export default function Navbar({
 }: NavbarProps) {
   const navItems = [
     { name: "Dashboard", icon: <LayoutDashboard size={18} /> },
-    { name: "My Files", icon: <Folder size={18} /> },
+    { name: "My Drive", icon: <Folder size={18} /> },
   ] as const;
 
   return (
-    <nav className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border-b border-gray-100 dark:border-zinc-800 sticky top-0 z-50 transition-colors duration-300">
+    <nav className="bg-white/100 dark:bg-zinc-900/80 backdrop-blur-md border-b border-gray-100 dark:border-zinc-800 sticky top-0 z-50 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           {/* Left Side: Brand/Name */}
