@@ -42,6 +42,9 @@ class FileReference(models.Model):
     filename = models.CharField(max_length=1024)
     upload_timestamp = models.DateTimeField(auto_now_add=True)
     
+    is_primary_uploader = models.BooleanField(default=False)
+    
+    
     class Meta:
         ordering = ['-upload_timestamp']
         verbose_name = "User File"

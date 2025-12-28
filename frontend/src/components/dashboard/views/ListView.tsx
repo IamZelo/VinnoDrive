@@ -107,7 +107,12 @@ const ListView = ({
                       >
                         <Download size={18} />
                       </button>
-                      <button className="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-400 hover:text-green-600 rounded-lg transition-colors">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                        }}
+                        className="p-2 hover:bg-gray-100 dark:hover:bg-zinc-800 text-gray-400 hover:text-green-600 rounded-lg transition-colors"
+                      >
                         <Share2 size={18} />
                       </button>
                       <button

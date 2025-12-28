@@ -11,7 +11,7 @@ import useTheme from "./utils/useTheme";
 function App() {
   useTheme();
   return (
-    <div className="min-w-[320px] min-h-screen bg-gray-50/50 dark:bg-black transition-colors duration-300">
+    <div className="min-w-[320px] min-h-screen bg-gray-50/50 dark:bg-black transition-colors duration-700">
       <Routes>
         <Route
           path="/"

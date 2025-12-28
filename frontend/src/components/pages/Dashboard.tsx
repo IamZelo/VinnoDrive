@@ -2,7 +2,8 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 
 import Loader from "../ui/Loader";
 import { Stats } from "../dashboard/Stats";
-
+import ConfirmDialog from "../ui/ConfirmDialog";
+import { AlertTriangle, File, Upload } from "lucide-react";
 import type {
   ViewMode,
   FileItem,
@@ -10,10 +11,16 @@ import type {
   FileViewItem,
   ViewItem,
 } from "../../types/drive";
-import { deleteFile, downloadFile, fetchFiles } from "../../api/files";
+import {
+  deleteFile,
+  downloadFile,
+  fetchFiles,
+  uploadFiles,
+} from "../../api/files";
 import Toolbar from "../dashboard/Toolbar";
 import ContentArea from "../dashboard/ContentArea";
 import InfoView from "../ui/InfoView";
+import DragDropWrapper from "../ui/FileDropZone";
 
 export default function Dashboard() {
   const [files, setFiles] = useState<FileItem[]>([]);
@@ -22,6 +29,8 @@ export default function Dashboard() {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPath, setCurrentPath] = useState<string>("");
   const [currentFile, setCurrentFile] = useState<ViewItem | null>(null);
+  const [fileToDelete, setFileToDelete] = useState<FileItem | null>(null);
+  const [filesToUpload, setFilesToUpload] = useState<FileList | null>(null);
 
   const loadFiles = async () => {
     const data = await fetchFiles();
@@ -41,8 +50,47 @@ export default function Dashboard() {
     setSearchQuery(query);
   }, []);
 
-  const handleDelete = async (fileItem: FileItem) => {
+  const handleConfirmUpload = async () => {
+    setLoading(true);
+    await uploadFiles(filesToUpload, currentPath);
+    loadFiles();
+    setLoading(false);
+    setFilesToUpload(null);
+    //setFiles((prevFiles) => prevFiles.filter((f) => f.id !== fileItem.id));
+  };
+  const handleUpload = (fileList: FileList | null) => {
+    setFilesToUpload(fileList);
+  };
+
+  const create_upload_list = (fileList: FileList | null) => {
+    if (!fileList) {
+      return "";
+    }
+    const fstr: string[] = [];
+    for (let i = 0; i < fileList.length; ++i) {
+      fstr.push(fileList[i].name);
+    }
+    console.log(fstr);
+    return (
+      <>
+        {fstr.map((value, index) => {
+          return (
+            <div key={index} className="flex items-center gap-1">
+              <File size={15} />
+              {value}
+            </div>
+          );
+        })}
+      </>
+    );
+  };
+
+  const handleDelete = (fileItem: FileItem) => {
+    setFileToDelete(fileItem);
+  };
+  const handleConfirmDelete = async (fileItem: FileItem) => {
     setFiles((prevFiles) => prevFiles.filter((f) => f.id !== fileItem.id));
+    setFileToDelete(null);
     try {
       if (currentFile?.type === "file" && currentFile.data.id === fileItem.id) {
         setCurrentFile(null);
@@ -54,6 +102,7 @@ export default function Dashboard() {
       alert("Failed to delete file");
     }
   };
+
   const handleDownload = async (fileItem: FileItem) => {
     downloadFile(fileItem);
   };
@@ -129,24 +178,16 @@ export default function Dashboard() {
     return <Loader text="Loading drive" />;
   }
 
-  const sidePanelClasses =
-    viewMode === "list"
-      ? "shrink-0 flex order-first" // List View
-      : "shrink-0 w-full md:w-60 lg:w-80 flex flex-col order-first md:order-none"; // Grid View
+  // const sidePanelClasses =
+  //   viewMode === "list"
+  //     ? "shrink-0 flex order-first" // List View
+  //     : "shrink-0 w-full md:w-60 lg:w-80 flex flex-col order-first md:order-none"; // Grid View
 
   return (
     <div className="flex flex-col w-full  max-w-450 mx-auto px-4 py-5 space-y-6 animate-in ">
       <Stats files={files} />
 
-      <div
-        className={`gap-3 items-stretch
-          ${
-            viewMode === "list" && currentFile
-              ? "flex flex-col" //
-              : "grid md:flex" //
-          }
-        `}
-      >
+      <div className="gap-3 items-stretch grid lg:flex">
         <div className="bg-white dark:bg-zinc-900 p-6 rounded-2xl border border-gray-100 dark:border-zinc-800 shadow-sm flex flex-col flex-grow gap-6">
           <Toolbar
             currentPath={currentPath}
@@ -158,20 +199,23 @@ export default function Dashboard() {
             loadFiles={loadFiles}
             isSearching={isSearching}
             setCurrentFile={setCurrentFile}
+            handleUpload={handleUpload}
           />
-          <ContentArea
-            viewItems={viewItems}
-            viewMode={viewMode}
-            isSearching={isSearching}
-            handleNavigate={handleNavigate}
-            handleFileClick={handleFileClick}
-            handleDelete={handleDelete}
-            handleDownload={handleDownload}
-          />
+          <DragDropWrapper onFileDrop={handleUpload} currentPath={currentPath}>
+            <ContentArea
+              viewItems={viewItems}
+              viewMode={viewMode}
+              isSearching={isSearching}
+              handleNavigate={handleNavigate}
+              handleFileClick={handleFileClick}
+              handleDelete={handleDelete}
+              handleDownload={handleDownload}
+            />
+          </DragDropWrapper>
         </div>
 
         {currentFile && (
-          <div className={sidePanelClasses}>
+          <div className="shrink-0 w-full lg:w-80 flex flex-col order-first lg:order-none">
             <InfoView
               viewItem={currentFile}
               handleDelete={handleDelete}
@@ -181,6 +225,37 @@ export default function Dashboard() {
           </div>
         )}
       </div>
+      <ConfirmDialog
+        isOpen={!!fileToDelete} // Open if a file is selected
+        onClose={() => setFileToDelete(null)}
+        onConfirm={() => {
+          fileToDelete ? handleConfirmDelete(fileToDelete) : null;
+        }}
+        title="Delete File?"
+        description={`Are you sure you want to delete "${fileToDelete?.filename}"? This action cannot be undone.`}
+        Icon={<AlertTriangle size={24} />}
+        variant="danger"
+        confirm="Delete"
+      />
+      <ConfirmDialog
+        isOpen={!!filesToUpload} // Open if a file is selected
+        onClose={() => setFilesToUpload(null)}
+        onConfirm={() => {
+          filesToUpload ? handleConfirmUpload() : null;
+        }}
+        title="Upload File?"
+        description={
+          <>
+            Are you sure you want to upload the following files?
+            <div className="mt-2 ml-2 text-xs">
+              {create_upload_list(filesToUpload)}
+            </div>
+          </>
+        }
+        Icon={<Upload size={24} />}
+        variant="primary"
+        confirm="Upload"
+      />
     </div>
   );
 }

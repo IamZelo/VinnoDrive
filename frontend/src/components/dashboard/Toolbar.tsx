@@ -23,6 +23,7 @@ interface NavProps {
   loadFiles: () => void;
   isSearching: boolean;
   setCurrentFile: (viewItem: ViewItem | null) => void;
+  handleUpload: (fileList: FileList | null) => void;
 }
 
 const Toolbar = ({
@@ -35,6 +36,7 @@ const Toolbar = ({
   loadFiles,
   isSearching,
   setCurrentFile,
+  handleUpload,
 }: NavProps) => {
   const handleNavigateUp = () => {
     if (currentPath === "") return;
@@ -77,30 +79,6 @@ const Toolbar = ({
       console.error("Failed to create folder", error);
       alert("Could not create folder. Please try again.");
     }
-  };
-
-  const handleFileUpload = async (fileList: FileList | null) => {
-    if (!fileList) return;
-    // Multiple file upload
-    for (const file of Array.from(fileList)) {
-      try {
-        const hash = await calculateHash(file);
-        const fullPath = currentPath + file.name;
-
-        const formData = new FormData();
-        formData.append("file", file);
-        formData.append("filename", fullPath);
-        formData.append("hash", hash);
-        formData.append("size", file.size.toString());
-
-        await api.post("/drive/upload/", formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        });
-      } catch (error) {
-        console.error(`Failed to upload ${file.name}:`, error);
-      }
-    }
-    loadFiles();
   };
 
   const renderBreadcrumbs = () => {
@@ -202,14 +180,17 @@ const Toolbar = ({
           </button>
 
           {/* Upload Button */}
-          <label className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl cursor-pointer transition-colors active:scale-95 shadow-lg shadow-blue-600/20">
+          <label
+            title="Upload files"
+            className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl cursor-pointer transition-colors active:scale-95 shadow-lg shadow-blue-600/20"
+          >
             <UploadCloud size={16} />
-            <span className="hidden sm:inline">New</span>
+            <span className="hidden sm:inline">Upload File</span>
             <input
               type="file"
               multiple
               className="hidden"
-              onChange={(e) => handleFileUpload(e.target.files)}
+              onChange={(e) => handleUpload(e.target.files)}
             />
           </label>
         </div>

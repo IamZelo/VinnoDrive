@@ -54,7 +54,7 @@ const InfoView = ({
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-8">
+        <div className="grid grid-cols-2 gap-2 lg:gap-8">
           {/* Filename */}
           <div className="col-span-full">
             <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider flex items-center gap-1.5 mb-1">

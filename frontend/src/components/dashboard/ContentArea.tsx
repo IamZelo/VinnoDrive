@@ -1,4 +1,4 @@
-import { FolderIcon, Search } from "lucide-react";
+import { PackageOpen, Search } from "lucide-react";
 import type { FileItem, ViewItem, ViewMode } from "../../types/drive";
 import GridView from "./views/GridView";
 import ListView from "./views/ListView";
@@ -30,7 +30,7 @@ const ContentArea = ({
             {isSearching ? (
               <Search className="text-gray-300" />
             ) : (
-              <FolderIcon className="text-gray-300" />
+              <PackageOpen className="text-gray-300" />
             )}
           </div>
           <h3 className="text-lg font-bold text-gray-900 dark:text-white">
@@ -39,7 +39,7 @@ const ContentArea = ({
           <p className="text-gray-500 dark:text-zinc-400 text-sm mt-1">
             {isSearching
               ? "Try a different keyword"
-              : "Upload files or create a folder"}
+              : "Drag & Drop to upload files or create a folder"}
           </p>
         </div>
       ) : (

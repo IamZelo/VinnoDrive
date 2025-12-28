@@ -1,5 +1,6 @@
 import api from "./api";
 import type { FileItem } from "../types/drive";
+import { calculateHash } from "../utils/hashUtils";
 
 export async function fetchFiles(): Promise<FileItem[]> {
   try {
@@ -21,7 +22,6 @@ export async function deleteFile(id: string) {
 
 export async function downloadFile(file: FileItem) {
   try {
-    // 1. Fetch the data as a "Blob" (binary large object)
     const response = await fetch(file.download_url);
     const blob = await response.blob();
 
@@ -46,5 +46,36 @@ export async function downloadFile(file: FileItem) {
     console.error("Download failed:", error);
     // Fallback: Just open the URL if the fancy download fails
     window.open(file.download_url, "_blank");
+  }
+}
+
+export async function uploadFiles(
+  fileList: FileList | null,
+  currentPath: string
+) {
+  if (!fileList) return;
+  if (fileList.length > 10) {
+    alert("You cannot upload more than 10 files!");
+    return;
+  }
+  // Multiple file upload
+  for (const file of Array.from(fileList)) {
+    try {
+      const hash = await calculateHash(file);
+      const fullPath = currentPath + file.name;
+
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("filename", fullPath);
+      formData.append("hash", hash);
+      formData.append("size", file.size.toString());
+
+      await api.post("/drive/upload/", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      console.debug("Uploaded file: " + file.name);
+    } catch (error) {
+      console.error(`Failed to upload ${file.name}:`, error);
+    }
   }
 }
