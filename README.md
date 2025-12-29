@@ -3,11 +3,15 @@
 
 **VinnoDrive** is a smart, content-aware cloud storage solution designed to optimize storage efficiency. It uses **SHA-256 hashing** to detect duplicate files across the entire system, ensuring that identical content is physically stored only once—saving massive amounts of disk space while maintaining user data privacy.
 
+## Preview Images
+[https://ibb.co/sd5142dK](https://ibb.co/album/0mWmLM)
+
+
 ## 🚀 Key Features
 
 * **Smart Deduplication:** Files are hashed on the client-side. If a file already exists in the cloud (uploaded by any user), we store a reference instead of a new physical copy.
 * **Virtual Folder System:** Create and navigate nested folders without complex database structures.
-* **Storage Quotas:** Enforced 10MB physical limit per user (deduplicated files don't count against this quota!).
+* **Storage Quotas:** Enforced 10MB physical limit per user (deduplicated files don't count against this quota!). It can be modified for eaach user through django admin page.
 * **Modern UI:** Built with React, TypeScript, and Tailwind CSS. Features a responsive design with a polished **Dark Mode**.
 * **Secure Auth:** Robust JWT (JSON Web Token) authentication flow with automatic token refreshing.
 * **Drag & Drop:** Intuitive file upload interface supporting multiple files.
@@ -24,7 +28,7 @@
 ### Backend
 * **Python 3.10+**
 * **Django 5** & **Django REST Framework (DRF)**
-* **PostgreSQL** (Production DB) / SQLite (Dev)
+* **PostgreSQL**
 * **SimpleJWT** (Authentication)
 
 ---
@@ -61,7 +65,7 @@ python manage.py runserver
 
 ```
 
-*The API will be available at `http://127.0.0.1:8000/api/*`
+*The API will be available at `http://127.0.0.1:8000/api/*` (local for now)
 
 ### 2. Frontend Setup (React)
 
@@ -124,3 +128,6 @@ vinnodrive/
 
 4. **Result:** The user sees the file in their dashboard instantly, and the system saves storage.
 
+## Issues (I didn't have any time left 🫠)
+- Could not add share system
+- Simple browser alert box for folders and alert.(Could make custom dialog box)
