@@ -21,8 +21,13 @@ import Toolbar from "../dashboard/Toolbar";
 import ContentArea from "../dashboard/ContentArea";
 import InfoView from "../ui/InfoView";
 import DragDropWrapper from "../ui/FileDropZone";
+import type { UserSession } from "../Home";
 
-export default function Dashboard() {
+interface Props {
+  session: UserSession | null;
+}
+
+export default function Dashboard({ session }: Props) {
   const [files, setFiles] = useState<FileItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
@@ -185,7 +190,7 @@ export default function Dashboard() {
 
   return (
     <div className="flex flex-col w-full  max-w-450 mx-auto px-4 py-5 space-y-6 animate-in ">
-      <Stats files={files} />
+      <Stats files={files} session={session} />
 
       <div className="gap-3 items-stretch grid lg:flex">
         <div className="bg-white dark:bg-zinc-900 p-6 rounded-2xl border border-gray-100 dark:border-zinc-800 shadow-sm flex flex-col flex-grow gap-6">

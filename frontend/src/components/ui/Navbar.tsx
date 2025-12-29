@@ -1,4 +1,4 @@
-import { LayoutDashboard, Folder } from "lucide-react";
+import { LayoutDashboard, File, Cog } from "lucide-react";
 import ThemeToggle from "./Buttons/ThemeToggle";
 import NavButton from "./Buttons/NavButton";
 import UserMenu from "../profile/UserMenu";
@@ -21,8 +21,8 @@ export default function Navbar({
 }: NavbarProps) {
   const navItems = [
     { name: "Dashboard", icon: <LayoutDashboard size={18} /> },
-    { name: "My Drive", icon: <Folder size={18} /> },
-    { name: "About", icon: <Folder size={18} /> },
+    { name: "Settings", icon: <Cog size={18} /> },
+    { name: "About", icon: <File size={18} /> },
   ] as const;
 
   return (

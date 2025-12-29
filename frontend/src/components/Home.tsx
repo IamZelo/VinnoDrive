@@ -9,8 +9,11 @@ import { useState, useEffect } from "react";
 import { ACCESS_TOKEN } from "../constants";
 import { useNavigate } from "react-router-dom";
 import Loader from "./ui/Loader";
-interface UserSession {
+import About from "./pages/About";
+export interface UserSession {
   username: string;
+  storage_used: number;
+  storage_quota: number;
   token: string;
 }
 const Home = () => {
@@ -28,7 +31,12 @@ const Home = () => {
           // Verify token and get fresh profile data from server
           const profile = await getUserProfile();
 
-          setSession({ username: profile.username, token });
+          setSession({
+            username: profile.username,
+            token,
+            storage_quota: profile.storage_quota,
+            storage_used: profile.storage_used,
+          });
         } catch (err) {
           console.error("Session expired or invalid:", err);
           localStorage.removeItem("access_token");
@@ -62,8 +70,9 @@ const Home = () => {
         onLogout={handleLogout}
       />
       <div className=" flex flex-col justify-between items-center">
-        {activeTab === "Dashboard" && <Dashboard />}
+        {activeTab === "Dashboard" && <Dashboard session={session} />}
         {activeTab === "My Drive" && <MyDrive />}
+        {activeTab === "About" && <About />}
         {activeTab === "Settings" && <Settings />}
       </div>
     </div>

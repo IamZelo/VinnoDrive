@@ -15,7 +15,9 @@ class UserProfileSerializer(serializers.ModelSerializer):
     """
     Serializes user data for the profile endpoint.
     """
+    storage_used = serializers.IntegerField(source='profile.storage_used', read_only=True)
+    storage_quota = serializers.IntegerField(source='profile.storage_limit', read_only=True)
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'date_joined']
+        fields = ['id', 'username', 'email', 'date_joined', 'storage_used', 'storage_quota']
         read_only_fields = ['id', 'date_joined']
