@@ -39,15 +39,21 @@ DEBUG = True
 ALLOWED_HOSTS = ["*"]
 
 REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": (
-        # 1. For React App (Bearer Tokens)
+    "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework_simplejwt.authentication.JWTAuthentication",
-        
-        
-    ),
+    ],
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated",
     ],
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle'
+    ],
+    
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '2/second',  # Guests get 2 requests per second
+        'user': '4/second',  # Logged in users get 2 requests per second
+    }
 }
 
 SIMPLE_JWT = {
